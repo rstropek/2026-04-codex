@@ -8,6 +8,7 @@ If you need to consider up-to-date documentation and samples (e.g. because you a
 * For next.js:
   * `next-devtools` MCP server
   * Note that you MUST CALL `init` in every chat session before using any other tools from this MCP server.
+  * Avoid Context7 for next.js-related documentation. Only fall back to Context7 if you cannot find the information you need in the `next-devtools` MCP server.
 * For Drizzle ORM:
   * Context7 library ID: llmstxt/orm_drizzle_team_llms_txt
 * For Biome.js:
@@ -26,8 +27,6 @@ Use pnpm as package manager.
 
 <files>
 Inspect `package.json` to see the dependencies with versions and scripts.
-
-Ignore all files in the `prompts` folder unless you are explicitly asked to read one of them.
 
 Use the following folder structure:
 * `packages/lib` — library with business logic and data access layer
