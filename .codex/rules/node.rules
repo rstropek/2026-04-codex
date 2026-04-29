@@ -1,0 +1,9 @@
+prefix_rule(
+    pattern = ["node", ["-v", "--version"]],
+    decision = "allow",
+    justification = "Node version check is a common operation and does not pose a risk.",
+    match = [
+      "node -v",
+      "node --version",
+    ],
+  )
