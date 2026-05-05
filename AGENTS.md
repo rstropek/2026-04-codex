@@ -18,7 +18,7 @@ If you need to consider up-to-date documentation and samples (e.g. because you a
 * For Fontawesome:
   * Get up-to-date documentation at https://docs.fontawesome.com/llms.txt
 
-Note: Read the `find-docs` skill before using the Context7 CLI.
+Note: Read the `find-docs` skill before using the Context7 CLI. IMPORTANT: Do NOT use `npx ctx7...` when you want to call the Context7 CLI. The script has already been installed globally. Use `ctx7...` (without `npx`) instead.
 </documentation-and-samples>
 
 <package-manager>
