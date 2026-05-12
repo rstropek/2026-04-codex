@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RepoRiskReport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["generated_at", "modules"],
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "description": "ISO-8601 timestamp."
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "risk_level", "reason", "recommended_owner"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Repo-relative path or workspace name."
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "reason": {
+            "type": "string",
+            "description": "One-sentence justification."
+          },
+          "recommended_owner": {
+            "type": "string",
+            "description": "Best-guess team or role responsible."
+          }
+        }
+      }
+    }
+  }
+}
