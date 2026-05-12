@@ -14,7 +14,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "risk_level", "reason"],
+        "required": ["path", "risk_level", "reason", "recommended_owner"],
         "properties": {
           "path": {
             "type": "string",

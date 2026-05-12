@@ -1,0 +1,27 @@
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "forbidden",
+    justification = "Never allow recursive force-delete in this project",
+    match = [
+      "rm -rf /",
+      "rm -rf node_modules",
+    ],
+  )
+
+prefix_rule(
+    pattern = ["bash", "-lc"],
+    decision = "forbidden",
+    justification = "Block shell smuggling — disallow ad-hoc `bash -lc` invocations",
+    match = [
+      "bash -lc 'git add . && rm -rf /'",
+    ],
+  )
+
+prefix_rule(
+    pattern = ["gh", ["pr", "issue"]],
+    decision = "prompt",
+    justification = "GitHub CLI write paths must be reviewed before running",
+    match = [
+      "gh pr comment 1 --body-file review.md",
+    ],
+  )

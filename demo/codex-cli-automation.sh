@@ -9,8 +9,10 @@
 # Repo:  /Users/rstropek/live/2026-04-codex  (pnpm monorepo, Next.js 16 + lib + console)
 # Run from the repo root.
 #
-# Pre-demo URL for the CI run (filled in after the workflow has executed):
-#   <run URL inserted by setup script — see demo 10>
+# Pre-demo URLs (filled in after the workflow ran successfully):
+#   Workflow run:  https://github.com/rstropek/2026-04-codex/actions/runs/25719252421
+#   Pull request:  https://github.com/rstropek/2026-04-codex/pull/1
+#   Run ID for `gh run view`:  25719252421
 # =============================================================================
 
 
@@ -199,8 +201,9 @@ cat demo/stage1-proposals.md
 # >>> Imagine Rainer reads proposals and gives a thumbs-up to #1. <<<
 
 # Stage 2 — resume and apply only #1.
+# Note: `codex exec resume` does NOT accept -s/--sandbox; override via -c instead.
 codex exec resume --last \
-  -s workspace-write \
+  -c sandbox_mode='"workspace-write"' \
   -c approval_policy='"never"' \
   "Apply only proposal #1 from your previous response. Make the minimal change. Do not touch anything else."
 
@@ -241,20 +244,24 @@ echo "Dev server PID: $WEB_PID — waiting for http://localhost:3000 ..."
 until curl -sf http://localhost:3000 > /dev/null; do sleep 1; done
 
 # 7c — Screenshot the broken state with Playwright.
-pnpm --filter @questionnaires/web exec playwright \
-  -- screenshot http://localhost:3000 demo/screenshot-broken.png \
+pnpm --filter @questionnaires/web exec playwright screenshot \
   --viewport-size=1280,800 \
-  --full-page
+  --full-page \
+  http://localhost:3000 "$PWD/demo/screenshot-broken.png"
 
 # Stop the dev server before letting Codex run (avoid port collisions).
 kill $WEB_PID 2>/dev/null || true
+# Next.js leaves background workers; give them a moment to release the port.
+sleep 2
 
 # 7d — Codex fixes it from the screenshot alone.
+# Note: put the positional prompt BEFORE `-i`. `-i / --image` is variadic
+# (`<FILE>...`) and will otherwise swallow the prompt as a filename.
 codex exec \
   -s workspace-write \
   -c approval_policy='"never"' \
-  -i demo/screenshot-broken.png \
-  "The attached image shows our home page rendered with a styling bug introduced in apps/web/src/app/page.module.css: the title is rotated and colored red, neither of which is intended. Remove ONLY the offending CSS rule. Do not change page.tsx."
+  "The attached image shows our home page rendered with a styling bug introduced in apps/web/src/app/page.module.css: the title is rotated and colored red, neither of which is intended. Remove ONLY the offending CSS rule. Do not change page.tsx." \
+  -i demo/screenshot-broken.png
 
 git --no-pager diff apps/web/src/app/page.module.css
 
@@ -262,10 +269,10 @@ git --no-pager diff apps/web/src/app/page.module.css
 pnpm --filter @questionnaires/web dev > /tmp/web-dev.log 2>&1 &
 WEB_PID=$!
 until curl -sf http://localhost:3000 > /dev/null; do sleep 1; done
-pnpm --filter @questionnaires/web exec playwright \
-  -- screenshot http://localhost:3000 demo/screenshot-fixed.png \
+pnpm --filter @questionnaires/web exec playwright screenshot \
   --viewport-size=1280,800 \
-  --full-page
+  --full-page \
+  http://localhost:3000 "$PWD/demo/screenshot-fixed.png"
 kill $WEB_PID 2>/dev/null || true
 
 # 7f — Cleanup.
@@ -282,10 +289,27 @@ git restore apps/web/src/app/page.module.css
 #     3) "How do we lock policy without editing every step?"→ profiles + -c.
 # =============================================================================
 
-# 8a — execpolicy: test a smuggled destructive command against project rules.
+# 8a — execpolicy: test commands against a small demo policy.
+# The policy lives in demo/rules/demo-policy.rules and contains forbidden
+# (rm -rf, bash -lc) and prompt (gh pr/issue) decisions. `--rules <PATH>` is
+# required; repeat the flag to compose multiple files (team + project).
+echo '--- forbidden: shell smuggling ---'
 codex execpolicy check \
+  --rules demo/rules/demo-policy.rules \
   --pretty \
   -- bash -lc 'git add . && rm -rf /'
+
+echo '--- prompt: GitHub CLI write paths ---'
+codex execpolicy check \
+  --rules demo/rules/demo-policy.rules \
+  --pretty \
+  -- gh pr comment 1 --body-file review.md
+
+echo '--- allow: a real project rule ---'
+codex execpolicy check \
+  --rules .codex/rules/pnpm-default.rules \
+  --pretty \
+  -- pnpm run test
 
 # 8b — A "deterministic CI run" recipe.
 #      --ignore-user-config: skip ~/.codex/config.toml so devs' personal
