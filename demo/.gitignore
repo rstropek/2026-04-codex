@@ -1,0 +1,10 @@
+# Demo outputs — regenerated each run, not worth committing.
+*.out
+*.out.md
+events.jsonl
+risks.json
+release-notes.md
+review.md
+repo-summary.md
+screenshot*.png
+stage1-proposals.md

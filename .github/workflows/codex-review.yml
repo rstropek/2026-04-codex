@@ -1,0 +1,88 @@
+name: Codex Review
+
+# Triggers:
+#  - pull_request: run on every PR.
+#  - workflow_dispatch: lets us click "Run workflow" from the GitHub UI (used for the live demo).
+#  - schedule: nightly health report. Disabled by default — uncomment for production use.
+on:
+  pull_request:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 4 * * *'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          # fetch-depth: 0 so we have history to diff against.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Codex CLI
+        run: npm install -g @openai/codex
+
+      - name: Print Codex version
+        run: codex --version
+
+      - name: Determine diff range
+        id: target
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "range=${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            # workflow_dispatch / schedule: review the most recent commit.
+            echo "range=HEAD~1...HEAD" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Codex review
+        env:
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+        run: |
+          set -o pipefail
+          git diff ${{ steps.target.outputs.range }} | \
+            codex exec \
+              --json \
+              --output-last-message review.md \
+              -s read-only \
+              -c approval_policy='"never"' \
+              "You are a senior code reviewer. The text in <stdin> is a git diff. Produce a concise Markdown review with these sections: Summary, Risks / Blockers, Suggestions, Nits. Keep it under 400 words. If the diff is empty, say so in one line." \
+              > events.jsonl
+
+      - name: Show review preview in log
+        run: |
+          echo '----- review.md -----'
+          cat review.md || true
+          echo '----- events.jsonl (last 20 lines) -----'
+          tail -n 20 events.jsonl || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-review
+          path: |
+            review.md
+            events.jsonl
+
+      - name: Post review as PR comment
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '### Codex Review'
+            echo
+            cat review.md
+          } > review-comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file review-comment.md
