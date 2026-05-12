@@ -9,15 +9,20 @@
     "client": "tsx jsonrpc-intro/client.ts",
     "hello": "tsx codex-raw/hello.ts",
     "multi-turn": "tsx codex-raw/multi-turn.ts",
+    "sdk-hello": "tsx codex-sdk/hello.ts",
+    "sdk-multi-turn": "tsx codex-sdk/multi-turn.ts",
+    "sdk-structured": "tsx codex-sdk/structured-output.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "express": "^5.0.1"
+    "@openai/codex-sdk": "^0.130.0",
+    "express": "^5.2.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.10.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.7.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
   }
 }

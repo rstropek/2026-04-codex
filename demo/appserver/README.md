@@ -13,14 +13,21 @@ see the wire format, the SDK stops feeling like magic.
 
 ```bash
 cd demo/appserver
-pnpm install
+pnpm install --ignore-workspace
 ```
+
+`--ignore-workspace` is required because this folder is intentionally
+outside the repo's pnpm workspace globs (`apps/*`, `packages/*`).
 
 You also need:
 
-- Node 22+
+- Node 22+.
 - The `codex` CLI on `PATH` (`codex --version` should work).
-- `CODEX_API_KEY` exported in your shell — same key the CLI uses.
+- Codex authentication set up — either a ChatGPT login (`codex login`) **or**
+  `CODEX_API_KEY` exported. The SDK and `codex app-server` both inherit
+  whatever the `codex` CLI uses on this machine; there is no SDK-specific
+  credential. On CI you'll typically use the API-key path; locally,
+  subscription is fine.
 
 ## Stage A — JSON-RPC from first principles (`jsonrpc-intro/`)
 
@@ -63,6 +70,25 @@ Watch the stream:
 
 The exact same notifications are what `codex exec --json` emits, and the same
 events the SDK exposes for streaming.
+
+## Stage C — Same scenarios, via the SDK (`codex-sdk/`)
+
+What `codex-raw/` did by hand, `@openai/codex-sdk` does in ~10 lines. The
+wire traffic is identical — only the lines *you* write change.
+
+```bash
+pnpm sdk-hello           # mirror of codex-raw/hello.ts
+pnpm sdk-multi-turn      # mirror of codex-raw/multi-turn.ts
+pnpm sdk-structured      # CLI Demo 3 (--output-schema) re-done with Zod
+```
+
+Each SDK script is annotated with the `codex-raw/` counterpart it replaces.
+Open them side-by-side — the diff is the point.
+
+`sdk-structured` reuses the same contract as
+`demo/schemas/risk.schema.json` (CLI Demo 3), but authored in Zod and
+converted via Zod v4's built-in `z.toJSONSchema()`. The SDK returns a
+JSON string; Zod parses + types it.
 
 ## Further reading
 
