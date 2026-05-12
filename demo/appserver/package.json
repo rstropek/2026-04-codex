@@ -1,0 +1,23 @@
+{
+  "name": "codex-appserver-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Learning-only samples for the Codex AppServer protocol (JSON-RPC 2.0).",
+  "scripts": {
+    "server": "tsx jsonrpc-intro/server.ts",
+    "client": "tsx jsonrpc-intro/client.ts",
+    "hello": "tsx codex-raw/hello.ts",
+    "multi-turn": "tsx codex-raw/multi-turn.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
