@@ -1,9 +1,18 @@
-# Live PR-review bot. The display copies in `demo/ci/` are kept in sync:
-#   - `demo/ci/codex-review.yml`        — Demo 10 (raw `codex exec`)
-#   - `demo/ci/codex-review-action.yml` — Demo 10b (this workflow)
-# See `demo/ci/README.md` for the security comparison.
+# Demo 10b — Same code-review bot as codex-review.yml, but using the
+# official `openai/codex-action` with the `unprivileged-user` safety
+# strategy. See README.md in this folder for the side-by-side security
+# comparison with Demo 10.
+#
+# Why `unprivileged-user`:
+#   - The action starts a local Responses-API proxy that holds the real key.
+#   - Codex is configured (via ~/.codex/config.toml) to talk to that proxy
+#     using a throwaway token — it never sees CODEX_API_KEY.
+#   - Codex runs as a separate Linux user (`codexuser`), so it can't read
+#     the runner user's process env or /proc/<proxy>/environ either.
+#   - Net: the agent has neither the secret value nor the access required
+#     to grab it from another process.
 
-name: Codex Review
+name: Codex Review (via codex-action, unprivileged)
 
 on:
   pull_request:
@@ -20,6 +29,10 @@ jobs:
       review: ${{ steps.codex.outputs.final-message }}
     steps:
       - name: Create unprivileged Codex user
+        # A dedicated system user that Codex will run as. The `runner` and
+        # `codexuser` accounts share a group so both can access the
+        # workspace, but `codexuser` cannot read `runner`'s environment or
+        # the proxy process memory.
         run: |
           sudo adduser --system --home /home/codexuser --shell /bin/bash --group codexuser
           sudo usermod -a -G codexuser runner
@@ -32,6 +45,7 @@ jobs:
           fetch-depth: 0
 
       - name: Share workspace with codexuser
+        # setgid on directories ensures new files inherit the shared group.
         run: |
           sudo chown -R runner:codexuser "$GITHUB_WORKSPACE"
           sudo chmod -R g+rwX "$GITHUB_WORKSPACE"
