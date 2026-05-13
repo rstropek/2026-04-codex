@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # =============================================================================
 # Codex CLI — Non-Interactive Automation Demo
-# heise Classroom session, ~2 hours, 10 demos.
+#
 # Run blocks individually (highlight-and-execute in your terminal, or copy-paste).
 # Do NOT `bash` the whole file end-to-end — each block has its own pacing and
 # you want to narrate between blocks.
 #
-# Repo:  /Users/rstropek/live/2026-04-codex  (pnpm monorepo, Next.js 16 + lib + console)
 # Run from the repo root.
 #
 # Pre-demo URLs (filled in after the workflow ran successfully):
