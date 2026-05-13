@@ -44,6 +44,19 @@ jobs:
             ${{ github.event.pull_request.base.ref }} \
             +refs/pull/${{ github.event.pull_request.number }}/head
 
+      - name: Determine diff range
+        id: range
+        # PR event → diff the actual PR range.
+        # Anything else (workflow_dispatch, schedule) → review the last commit.
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=HEAD~1" >> "$GITHUB_OUTPUT"
+            echo "head=HEAD" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run Codex review
         id: codex
         uses: openai/codex-action@v1
@@ -52,19 +65,29 @@ jobs:
           safety-strategy: unprivileged-user
           codex-user: codexuser
           sandbox: read-only
+          output-file: review.md
           prompt: |
-            You are a senior code reviewer. Review ONLY the changes in this PR.
+            You are a senior code reviewer. Review ONLY the changes in the
+            following git range.
 
             Diff range:
-              ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+              ${{ steps.range.outputs.base }}...${{ steps.range.outputs.head }}
 
             Inspect the diff with:
-              git log --oneline ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
-              git diff ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+              git log --oneline ${{ steps.range.outputs.base }}...${{ steps.range.outputs.head }}
+              git diff ${{ steps.range.outputs.base }}...${{ steps.range.outputs.head }}
 
             Produce a concise Markdown review with these sections:
             Summary, Risks / Blockers, Suggestions, Nits. Keep it under 400
             words. If the diff is empty, say so in one line.
+
+      - name: Upload review as artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: codex-review
+          path: review.md
+          if-no-files-found: warn
 
   post-review:
     runs-on: ubuntu-latest

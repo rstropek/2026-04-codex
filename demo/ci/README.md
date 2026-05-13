@@ -78,10 +78,33 @@ boilerplate has motivation.
 
 - **Internal repo, low-trust prompt, short-lived secrets:** Demo 10 is
   acceptable if you're comfortable rotating the key.
-- **Public repo, PRs from forks, long-lived secrets, or any compliance
-  story:** Demo 10b with `unprivileged-user`. Treat the agent as a
+- **Same-repo branch PRs, long-lived secrets, or any compliance story:**
+  Demo 10b with `unprivileged-user`. Treat the agent as a
   potentially-hostile process and the workflow defends accordingly.
 
 A middle option — `safety-strategy: drop-sudo` — keeps Codex as the
 `runner` user but strips passwordless sudo. Cheaper than `unprivileged-user`,
 but doesn't defend against the agent reading the proxy's `/proc`.
+
+### Fork PRs — important caveat
+
+The `pull_request` event from a forked repository **does not receive
+repository secrets**, so `${{ secrets.CODEX_API_KEY }}` will be empty and
+the action will fail. This applies to both Demo 10 and Demo 10b.
+
+Options if you need to review fork PRs:
+
+1. **`pull_request_target`** — runs in the context of the base repo and
+   *does* get secrets, but checks out the base by default. You must
+   explicitly check out the fork's head, which means the workflow file
+   from `main` is what runs (good for security) and you are about to feed
+   untrusted code to a privileged job (read the GitHub docs on
+   `pull_request_target` before going down this path).
+2. **Two-stage workflow** — `pull_request` builds a sanitized diff
+   artifact; a `workflow_run` job picks it up with secrets and runs Codex.
+   More plumbing, fewer footguns.
+3. **Require contributors to open PRs from a same-repo branch.** Simplest
+   answer for internal/closed communities.
+
+Neither file in this folder handles fork PRs out of the box — they assume
+same-repo branches.
