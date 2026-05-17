@@ -25,7 +25,7 @@ import path from "node:path";
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  "../../.."
+  "../../..",
 );
 
 const codex = new Codex();
@@ -35,13 +35,13 @@ const thread = codex.startThread({
 });
 
 const first = await thread.run(
-  "List the top-level workspaces in this monorepo."
+  "List the top-level workspaces in this monorepo.",
 );
 console.log("─── [turn 1] ───");
 console.log(first.finalResponse);
 
 const second = await thread.run(
-  "Which of those workspaces would you start reading first to understand the project, and why?"
+  "Which of those workspaces would you start reading first to understand the project, and why?",
 );
 console.log("─── [turn 2] ───");
 console.log(second.finalResponse);

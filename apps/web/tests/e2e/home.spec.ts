@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-test("renders the hello world page", async ({ page }) => {
+test("home page renders with primary navigation", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: "Hello World", level: 1 }),
+    page.getByRole("heading", { name: "Questionnaires", level: 1 }),
   ).toBeVisible();
-  await expect(
-    page.getByText("Shared library result: 1 + 2 = 3"),
-  ).toBeVisible();
-  await expect(page.locator('svg[data-icon="thumbs-up"]')).toBeVisible();
+
+  const nav = page.getByRole("navigation", { name: "Primary" });
+  await expect(nav.getByRole("link", { name: "Questionnaires" })).toBeVisible();
+  await expect(nav.getByRole("link", { name: "About" })).toBeVisible();
 });

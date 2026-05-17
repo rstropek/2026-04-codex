@@ -1,20 +1,23 @@
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
+import { TopNav } from "./_components/top-nav";
 import "./globals.css";
+import styles from "./layout.module.css";
 
 config.autoAddCss = false;
 
-const manrope = Manrope({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
-  title: "Questionnaire Demo",
-  description: "Sample workspace for the Codex classroom session",
+  title: "Questionnaires",
+  description: "Build, share, and analyse questionnaires.",
 };
 
 export default function RootLayout({
@@ -23,8 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={manrope.variable}>
-      <body>{children}</body>
+    <html lang="en" className={jakarta.variable}>
+      <body>
+        <TopNav />
+        <main className={styles.main}>
+          <div className={styles.content}>{children}</div>
+        </main>
+      </body>
     </html>
   );
 }

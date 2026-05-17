@@ -19,7 +19,7 @@ import path from "node:path";
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  "../../.."
+  "../../..",
 );
 
 const RiskReport = z.object({
@@ -30,7 +30,7 @@ const RiskReport = z.object({
       risk_level: z.enum(["low", "medium", "high"]),
       reason: z.string().describe("One-sentence justification"),
       recommended_owner: z.string().describe("Best-guess team or role"),
-    })
+    }),
   ),
 });
 type RiskReport = z.infer<typeof RiskReport>;
@@ -45,7 +45,7 @@ const turn = await thread.run(
   `Audit the source tree under packages/ and apps/. Classify each workspace ` +
     `by risk if changed. Return JSON matching the provided schema. Use ` +
     `${new Date().toISOString()} as generated_at.`,
-  { outputSchema: z.toJSONSchema(RiskReport) }
+  { outputSchema: z.toJSONSchema(RiskReport) },
 );
 
 const parsed: RiskReport = RiskReport.parse(JSON.parse(turn.finalResponse));
@@ -58,5 +58,5 @@ const high = parsed.modules.filter((m) => m.risk_level === "high");
 console.log(
   high.length === 0
     ? "Gate PASSED"
-    : `Gate FAILED — ${high.length} high-risk module(s)`
+    : `Gate FAILED — ${high.length} high-risk module(s)`,
 );

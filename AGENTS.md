@@ -36,6 +36,10 @@ Use the following folder structure:
 Do NOT add any data access code to the web or console apps. This code must be in the library.
 </files>
 
+<documentation>
+Conceptual and architectural documentation for this project lives in the `docs/` folder at the repo root. Before making non-trivial changes to a subsystem, check whether `docs/` has a file for it and read it first. Those notes capture the *why* behind decisions that aren't visible in the code. When you finish work that changes a documented invariant or adds a new architectural concept, update or add the relevant doc.
+</documentation>
+
 <nextjs-guidelines>
 * Use App Router
 * Use Server Components for data fetching

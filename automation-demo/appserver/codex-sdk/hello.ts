@@ -18,7 +18,7 @@ import path from "node:path";
 // Point at the monorepo root, not demo/appserver where `pnpm` runs from.
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  "../../.."
+  "../../..",
 );
 
 const codex = new Codex();
