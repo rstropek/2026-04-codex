@@ -215,6 +215,52 @@ describe("questionnaire CLI", () => {
     expect(subs[1]?.versionNumber).toBe(2);
     expect(subs[1]?.answers).toHaveLength(6);
 
+    const currentResults = await runArgs(
+      ["questionnaire", "result", "--id", String(created.id)],
+      {},
+      dbPath,
+    );
+    expect(currentResults.exitCode).toBe(0);
+    const currentResult = parseOut<{
+      versionNumber: number;
+      submissionCount: number;
+      questions: Array<
+        | { type: "text"; answers: string[] }
+        | { type: "boolean"; trueCount: number; falseCount: number }
+        | { type: "likert"; counts: number[] }
+      >;
+    }>(currentResults.stdout);
+    expect(currentResult.versionNumber).toBe(2);
+    expect(currentResult.submissionCount).toBe(1);
+    expect(currentResult.questions).toHaveLength(6);
+    expect(currentResult.questions[0]).toMatchObject({
+      type: "text",
+      answers: ["Great support"],
+    });
+
+    const v1Results = await runArgs(
+      ["questionnaire", "result", "--id", String(created.id), "--version", "1"],
+      {},
+      dbPath,
+    );
+    expect(v1Results.exitCode).toBe(0);
+    const v1Result = parseOut<{
+      versionNumber: number;
+      submissionCount: number;
+      questions: Array<
+        | { type: "text"; answers: string[] }
+        | { type: "boolean"; trueCount: number; falseCount: number }
+        | { type: "likert"; counts: number[] }
+      >;
+    }>(v1Results.stdout);
+    expect(v1Result.versionNumber).toBe(1);
+    expect(v1Result.submissionCount).toBe(1);
+    expect(v1Result.questions).toHaveLength(5);
+    expect(v1Result.questions[0]).toMatchObject({
+      type: "text",
+      answers: ["Easy to use"],
+    });
+
     const del = await runArgs(
       ["questionnaire", "delete", "--id", String(created.id)],
       {},
@@ -246,6 +292,17 @@ describe("questionnaire CLI", () => {
           answers: [],
         }),
       },
+      dbPath,
+    );
+    expect(res.exitCode).toBe(1);
+    const payload = JSON.parse(res.stderr) as { error: { type: string } };
+    expect(payload.error.type).toBe("NotFoundError");
+  });
+
+  it("returns a NotFoundError envelope for results against an unknown questionnaire", async () => {
+    const res = await runArgs(
+      ["questionnaire", "result", "--id", "9999"],
+      {},
       dbPath,
     );
     expect(res.exitCode).toBe(1);

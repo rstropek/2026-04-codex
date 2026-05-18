@@ -3,8 +3,8 @@ name: questionnaire-cli
 description: >-
   How to drive the questionnaire data access layer from the shell via the
   `apps/console` CLI. Use this skill whenever the user wants to create, list,
-  inspect, update, soft-delete questionnaires, or submit/list answers from a
-  terminal.
+  inspect, update, soft-delete questionnaires, view aggregated results, or
+  submit/list answers from a terminal.
 ---
 
 # questionnaire CLI
@@ -91,6 +91,18 @@ pnpm console questionnaire get --id 1 --version 1
 
 Returns a `QuestionnaireSummary[]`. Soft-deleted rows are hidden unless
 `--include-deleted` is set.
+
+### `questionnaire result --id <n> [--version <n>]`
+
+Returns the aggregated `QuestionnaireVersionResults` JSON from the lib:
+metadata, submission count, and per-question results. Without `--version`,
+the command uses the questionnaire's current version, matching the web
+results page.
+
+```
+pnpm console questionnaire result --id 1
+pnpm console questionnaire result --id 1 --version 1
+```
 
 ### `questionnaire update --id <n>`
 
@@ -209,6 +221,12 @@ Count submissions per version:
 ```
 pnpm console submission list --questionnaire-id $ID \
   | jq 'group_by(.versionNumber) | map({version: .[0].versionNumber, count: length})'
+```
+
+Show the current version's aggregated results:
+
+```
+pnpm console questionnaire result --id $ID | jq .
 ```
 
 Inspect issues from a failed submit (stderr → JSON):

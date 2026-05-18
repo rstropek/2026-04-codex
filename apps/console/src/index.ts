@@ -5,6 +5,7 @@ import {
   cmdDelete,
   cmdGet,
   cmdList,
+  cmdResult,
   cmdUpdate,
 } from "./commands/questionnaire.js";
 import {
@@ -74,6 +75,16 @@ export async function runCli(io: CliIo): Promise<number> {
         cmdGet(ctx, mergeDb(program, opts));
       },
     );
+
+  questionnaire
+    .command("result")
+    .description("Get aggregated results for a questionnaire version")
+    .requiredOption("--id <n>", "Questionnaire id")
+    .option("--version <n>", "Specific version number (defaults to current)")
+    .option("--db <url>", "Database URL")
+    .action((opts: { db?: string; id: string; version?: string }) => {
+      cmdResult(ctx, mergeDb(program, opts));
+    });
 
   questionnaire
     .command("list")

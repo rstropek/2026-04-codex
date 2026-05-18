@@ -1,6 +1,7 @@
 import {
   createQuestionnaire,
   getQuestionnaire,
+  getQuestionnaireVersionResults,
   listQuestionnaires,
   softDeleteQuestionnaire,
   updateQuestionnaire,
@@ -42,6 +43,24 @@ export function cmdGet(
       ...(opts.version !== undefined ? { version: Number(opts.version) } : {}),
       ...(opts.includeDeleted ? { includeDeleted: true } : {}),
     });
+    writeJson(ctx.stdout, result);
+  } finally {
+    sqlite.close();
+  }
+}
+
+export function cmdResult(
+  ctx: CommandContext,
+  opts: { db?: string; id: string; version?: string },
+): void {
+  const { db, sqlite } = openDb({ dbFlag: opts.db, env: ctx.env });
+  try {
+    const questionnaireId = Number(opts.id);
+    const version =
+      opts.version !== undefined
+        ? Number(opts.version)
+        : getQuestionnaire(db, questionnaireId).version.versionNumber;
+    const result = getQuestionnaireVersionResults(db, questionnaireId, version);
     writeJson(ctx.stdout, result);
   } finally {
     sqlite.close();

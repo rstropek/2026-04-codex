@@ -27,12 +27,14 @@ add it there. Do not let the CLI grow a parallel notion of the domain.
 
 Two groups plus a maintenance command:
 
-- `questionnaire create | get | list | update | delete`
+- `questionnaire create | get | result | list | update | delete`
 - `submission list | submit`
 - `db migrate | sample`
 
 `create`, `update`, and `submit` take a JSON document via `--file <path>` or
-piped stdin. Everything else is flag-driven. Run `pnpm console --help` or
+piped stdin. Everything else is flag-driven. `questionnaire result --id <n>`
+returns the current version's aggregated results; pass `--version <n>` to
+inspect an older version. Run `pnpm console --help` or
 `pnpm console <group> --help` for the live reference (commander generates it).
 
 `db sample [--seed <n>]` seeds three realistic questionnaires (one with two
