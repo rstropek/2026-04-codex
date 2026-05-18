@@ -167,3 +167,7 @@ repository to async without changing the driver.
 - Public API surface is the `src/index.ts` barrel. The package also exposes
   subpaths `./db` and `./schema` via the `exports` map — use those for
   consumers that need the raw drizzle client or table definitions.
+- Higher-level orchestration that composes existing repo functions (e.g. seeding,
+  bulk import) lives in its own module and goes through the public repo API —
+  see `questionnaires/sample.ts` for an example. Do not reach into the schema
+  or write raw SQL from these helpers.

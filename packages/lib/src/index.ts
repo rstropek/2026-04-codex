@@ -2,8 +2,6 @@ export type { CreatedDb, QuestionnaireDb } from "./db/client.js";
 export { createDb } from "./db/client.js";
 export { applyMigrations } from "./db/migrate.js";
 export { createTestDb } from "./db/test-setup.js";
-export * as math from "./math";
-export { add } from "./math";
 export type { Issue, IssueCode } from "./questionnaires/errors.js";
 export { NotFoundError, ValidationError } from "./questionnaires/errors.js";
 export type {
@@ -19,6 +17,12 @@ export {
   submitAnswers,
   updateQuestionnaire,
 } from "./questionnaires/repository.js";
+export type {
+  SeededQuestionnaire,
+  SeedSampleOptions,
+  SeedSampleResult,
+} from "./questionnaires/sample.js";
+export { seedSampleData } from "./questionnaires/sample.js";
 export type {
   Answer,
   CreateQuestionnaireInput,
