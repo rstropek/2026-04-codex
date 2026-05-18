@@ -1,5 +1,5 @@
 prefix_rule(
-    pattern = ["pnpm", ["run", "outdated", "update", "create", "-v", "--version", "format", "lint", "test", "typecheck", "console", "dev:web", "test:e2e", "build"]],
+    pattern = ["pnpm", ["run", "outdated", "update", "create", "-v", "--version", "format", "lint", "test", "typecheck", "console", "dev:web", "test:e2e", "build", "view"]],
     decision = "allow",
     justification = "Allow common pnpm commands",
     match = [

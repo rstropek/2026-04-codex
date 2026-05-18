@@ -18,6 +18,11 @@ If you need to consider up-to-date documentation and samples (e.g. because you a
   * Additionally, you can check https://vitest.dev/llms.txt
 * For Fontawesome:
   * Get up-to-date documentation at https://docs.fontawesome.com/llms.txt
+* For `mcp-handler` package:
+  * Context7 library ID: /vercel/mcp-handler
+* For creating MCP servers:
+  * Use the `mcp-builder` skill to get up-to-date documentation.
+  * Only consult Context7 if the `mcp-builder` skill does not have the information you need.
 
 Note: Read the `find-docs` skill before using the Context7 CLI. IMPORTANT: Do NOT use `npx ctx7...` when you want to call the Context7 CLI. The script has already been installed globally. Use `ctx7...` (without `npx`) instead.
 </documentation-and-samples>
@@ -51,6 +56,7 @@ Conceptual and architectural documentation for this project lives in the `docs/`
   * Limit global styles to a minimum, prefer local styles
   * Use HTML tables only if it has a significant benefit, otherwise use CSS Grid or Flexbox
 * Use self-hosted Google Fonts as specified in the brand guidelines
+* Use `mcp-handler` package to host MCP servers in a Next.js project
 </nextjs-guidelines>
 
 <typescript-guidelines>
