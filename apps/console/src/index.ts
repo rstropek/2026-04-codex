@@ -32,7 +32,7 @@ export async function runCli(io: CliIo): Promise<number> {
     .description("CLI for the questionnaire data access layer")
     .option(
       "--db <url>",
-      "Database URL (defaults to $DATABASE_URL or ./questionnaire.db)",
+      "Database URL (defaults to $DATABASE_URL or <cwd>/questionnaire.db)",
     )
     .exitOverride()
     .configureOutput({

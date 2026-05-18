@@ -1,3 +1,4 @@
+import path from "node:path";
 import { applyMigrations, type CreatedDb, createDb } from "@questionnaires/lib";
 
 export type ResolveDbOptions = {
@@ -6,7 +7,10 @@ export type ResolveDbOptions = {
 };
 
 export function resolveDbUrl(opts: ResolveDbOptions): string {
-  return opts.dbFlag ?? opts.env.DATABASE_URL ?? "./questionnaire.db";
+  if (opts.dbFlag) return opts.dbFlag;
+  if (opts.env.DATABASE_URL) return opts.env.DATABASE_URL;
+  const root = opts.env.INIT_CWD ?? process.cwd();
+  return path.join(root, "questionnaire.db");
 }
 
 export function openDb(opts: ResolveDbOptions): CreatedDb & { url: string } {

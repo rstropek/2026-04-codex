@@ -57,7 +57,11 @@ text; downstream tooling can branch on `code` directly.
 
 ## DB resolution
 
-`--db <url>` → `DATABASE_URL` env → `./questionnaire.db`. Every command opens
+`--db <url>` → `DATABASE_URL` env → `<invoking-cwd>/questionnaire.db`. The
+default anchors to `$INIT_CWD` (set by pnpm/npm to the directory the user ran
+the script from), falling back to `process.cwd()`. This keeps `pnpm console`
+from creating the DB inside `apps/console/` when run from the workspace root.
+Every command opens
 the DB and unconditionally calls `applyMigrations` before doing work; the
 Drizzle migrator is idempotent, so this both creates a fresh DB on first use
 and is a no-op on subsequent runs. The explicit `db migrate` command is the

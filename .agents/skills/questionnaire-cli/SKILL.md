@@ -41,8 +41,9 @@ pnpm console db sample -h            # leaf-command flags
 ### Global flag
 
 `--db <url>` — optional. Resolution order: this flag → `$DATABASE_URL` env →
-`./questionnaire.db`. The DB is created and migrated automatically on first
-use.
+`<invoking-cwd>/questionnaire.db` (anchored to `$INIT_CWD` when run via
+pnpm/npm scripts, otherwise `process.cwd()`). The DB is created and migrated
+automatically on first use.
 
 ## Commands
 
