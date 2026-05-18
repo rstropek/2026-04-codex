@@ -8,12 +8,12 @@ export type IssueCode =
   | "likert_out_of_range"
   | "invalid_input";
 
-export interface Issue {
+export type Issue = {
   code: IssueCode;
   qid?: string;
   message: string;
   path?: (string | number)[];
-}
+};
 
 export class NotFoundError extends Error {
   constructor(message: string) {

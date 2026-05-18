@@ -4,10 +4,10 @@ import * as schema from "./schema.js";
 
 export type QuestionnaireDb = ReturnType<typeof drizzle<typeof schema>>;
 
-export interface CreatedDb {
+export type CreatedDb = {
   db: QuestionnaireDb;
   sqlite: Database.Database;
-}
+};
 
 export function createDb(url: string): CreatedDb {
   const sqlite = new Database(url);

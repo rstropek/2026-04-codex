@@ -5,11 +5,11 @@ import { PassThrough, Readable } from "node:stream";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { runCli } from "./index.js";
 
-interface RunResult {
+type RunResult = {
   exitCode: number;
   stdout: string;
   stderr: string;
-}
+};
 
 async function runArgs(
   argv: string[],

@@ -1,9 +1,9 @@
 import { applyMigrations, type CreatedDb, createDb } from "@questionnaires/lib";
 
-export interface ResolveDbOptions {
+export type ResolveDbOptions = {
   dbFlag?: string | undefined;
   env: NodeJS.ProcessEnv;
-}
+};
 
 export function resolveDbUrl(opts: ResolveDbOptions): string {
   return opts.dbFlag ?? opts.env.DATABASE_URL ?? "./questionnaire.db";

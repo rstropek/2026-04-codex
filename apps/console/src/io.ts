@@ -2,11 +2,11 @@ import { readFile } from "node:fs/promises";
 import type { Readable } from "node:stream";
 import { InputError } from "./errors.js";
 
-export interface ReadJsonOptions {
+export type ReadJsonOptions = {
   filePath?: string | undefined;
   stdin: Readable;
   stdinIsTty: boolean;
-}
+};
 
 export async function readJsonInput(opts: ReadJsonOptions): Promise<unknown> {
   const raw = await readRawInput(opts);

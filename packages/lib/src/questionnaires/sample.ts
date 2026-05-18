@@ -10,23 +10,45 @@ import type {
   Answer,
   CreateQuestionnaireInput,
   NewQuestionInput,
+  SubmitAnswersInput,
+  UpdateQuestionnaireInput,
 } from "./schemas.js";
 
-export interface SeedSampleOptions {
+export type SeedSampleOptions = {
   seed?: number;
-}
+};
 
-export interface SeededQuestionnaire {
+export type SeededQuestionnaire = {
   id: number;
   title: string;
   versions: number[];
   submissions: number;
-}
+};
 
-export interface SeedSampleResult {
+export type SeedSampleResult = {
   seed: number;
   questionnaires: SeededQuestionnaire[];
-}
+};
+
+export type SampleQuestionnairePlan = {
+  /** Local index within the plan, 1-based. Translates to DB id after seeding. */
+  localId: number;
+  title: string;
+  initial: CreateQuestionnaireInput;
+  /** v2 input if the questionnaire should be updated to a second version. */
+  update?: UpdateQuestionnaireInput;
+  versions: number[];
+  /** Submissions indexed by versionNumber. */
+  submissionsByVersion: Map<
+    number,
+    Omit<SubmitAnswersInput, "questionnaireId">[]
+  >;
+};
+
+export type SampleDataPlan = {
+  seed: number;
+  questionnaires: SampleQuestionnairePlan[];
+};
 
 const customerFeedbackV1: CreateQuestionnaireInput = {
   title: "Customer Feedback Q2",
@@ -164,6 +186,95 @@ function buildAnswers(
   return answers;
 }
 
+/**
+ * Pure planner. Given a seed, returns the exact dataset that
+ * {@link seedSampleData} would persist — without touching a DB. Both the
+ * seeding routine and tests consume this so that expected results can be
+ * derived without re-deriving RNG state.
+ */
+export function buildSampleData(seed: number): SampleDataPlan {
+  if (!Number.isFinite(seed)) {
+    throw new ValidationError([
+      { code: "invalid_input", message: "seed must be a finite number" },
+    ]);
+  }
+  const rng = mulberry32(seed);
+  const faker = new Faker({ locale: en, seed });
+
+  // Customer Feedback (versioned)
+  const cfCount = pickSubmissionCount(rng);
+  const cfV2Fraction = 0.4 + rng() * 0.4;
+  let cfV2 = Math.round(cfCount * cfV2Fraction);
+  if (cfV2 < 3) cfV2 = 3;
+  if (cfCount - cfV2 < 3) cfV2 = cfCount - 3;
+  const cfV1 = cfCount - cfV2;
+
+  const cfV1Subs = [] as Omit<SubmitAnswersInput, "questionnaireId">[];
+  for (let i = 0; i < cfV1; i++) {
+    cfV1Subs.push({
+      version: 1,
+      answers: buildAnswers(customerFeedbackV1.questions, rng, faker),
+    });
+  }
+  const cfV2Subs = [] as Omit<SubmitAnswersInput, "questionnaireId">[];
+  for (let i = 0; i < cfV2; i++) {
+    cfV2Subs.push({
+      version: 2,
+      answers: buildAnswers(customerFeedbackV2.questions, rng, faker),
+    });
+  }
+
+  // Onboarding
+  const obCount = pickSubmissionCount(rng);
+  const obSubs = [] as Omit<SubmitAnswersInput, "questionnaireId">[];
+  for (let i = 0; i < obCount; i++) {
+    obSubs.push({
+      version: 1,
+      answers: buildAnswers(onboardingSurvey.questions, rng, faker),
+    });
+  }
+
+  // Incident retrospective
+  const irCount = pickSubmissionCount(rng);
+  const irSubs = [] as Omit<SubmitAnswersInput, "questionnaireId">[];
+  for (let i = 0; i < irCount; i++) {
+    irSubs.push({
+      version: 1,
+      answers: buildAnswers(incidentRetrospective.questions, rng, faker),
+    });
+  }
+
+  const questionnaires: SampleQuestionnairePlan[] = [
+    {
+      localId: 1,
+      title: customerFeedbackV1.title,
+      initial: customerFeedbackV1,
+      update: customerFeedbackV2,
+      versions: [1, 2],
+      submissionsByVersion: new Map([
+        [1, cfV1Subs],
+        [2, cfV2Subs],
+      ]),
+    },
+    {
+      localId: 2,
+      title: onboardingSurvey.title,
+      initial: onboardingSurvey,
+      versions: [1],
+      submissionsByVersion: new Map([[1, obSubs]]),
+    },
+    {
+      localId: 3,
+      title: incidentRetrospective.title,
+      initial: incidentRetrospective,
+      versions: [1],
+      submissionsByVersion: new Map([[1, irSubs]]),
+    },
+  ];
+
+  return { seed, questionnaires };
+}
+
 export function seedSampleData(
   db: QuestionnaireDb,
   opts: SeedSampleOptions = {},
@@ -174,75 +285,29 @@ export function seedSampleData(
     ]);
   }
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
-  const rng = mulberry32(seed);
-  const faker = new Faker({ locale: en, seed });
+  const plan = buildSampleData(seed);
 
-  const cf = createQuestionnaire(db, customerFeedbackV1);
-  updateQuestionnaire(db, cf.id, customerFeedbackV2);
-  const ob = createQuestionnaire(db, onboardingSurvey);
-  const ir = createQuestionnaire(db, incidentRetrospective);
-
-  const cfCount = pickSubmissionCount(rng);
-  const cfV2Fraction = 0.4 + rng() * 0.4;
-  let cfV2 = Math.round(cfCount * cfV2Fraction);
-  if (cfV2 < 3) cfV2 = 3;
-  if (cfCount - cfV2 < 3) cfV2 = cfCount - 3;
-  const cfV1 = cfCount - cfV2;
-
-  for (let i = 0; i < cfV1; i++) {
-    submitAnswers(db, {
-      questionnaireId: cf.id,
-      version: 1,
-      answers: buildAnswers(customerFeedbackV1.questions, rng, faker),
-    });
-  }
-  for (let i = 0; i < cfV2; i++) {
-    submitAnswers(db, {
-      questionnaireId: cf.id,
-      version: 2,
-      answers: buildAnswers(customerFeedbackV2.questions, rng, faker),
+  const seeded: SeededQuestionnaire[] = [];
+  for (const q of plan.questionnaires) {
+    const created = createQuestionnaire(db, q.initial);
+    if (q.update) {
+      updateQuestionnaire(db, created.id, q.update);
+    }
+    let total = 0;
+    for (const version of q.versions) {
+      const subs = q.submissionsByVersion.get(version) ?? [];
+      for (const s of subs) {
+        submitAnswers(db, { ...s, questionnaireId: created.id });
+        total++;
+      }
+    }
+    seeded.push({
+      id: created.id,
+      title: q.title,
+      versions: q.versions,
+      submissions: total,
     });
   }
 
-  const obCount = pickSubmissionCount(rng);
-  for (let i = 0; i < obCount; i++) {
-    submitAnswers(db, {
-      questionnaireId: ob.id,
-      version: 1,
-      answers: buildAnswers(onboardingSurvey.questions, rng, faker),
-    });
-  }
-
-  const irCount = pickSubmissionCount(rng);
-  for (let i = 0; i < irCount; i++) {
-    submitAnswers(db, {
-      questionnaireId: ir.id,
-      version: 1,
-      answers: buildAnswers(incidentRetrospective.questions, rng, faker),
-    });
-  }
-
-  return {
-    seed,
-    questionnaires: [
-      {
-        id: cf.id,
-        title: customerFeedbackV1.title,
-        versions: [1, 2],
-        submissions: cfCount,
-      },
-      {
-        id: ob.id,
-        title: onboardingSurvey.title,
-        versions: [1],
-        submissions: obCount,
-      },
-      {
-        id: ir.id,
-        title: incidentRetrospective.title,
-        versions: [1],
-        submissions: irCount,
-      },
-    ],
-  };
+  return { seed, questionnaires: seeded };
 }

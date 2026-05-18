@@ -11,13 +11,13 @@ export class InputError extends Error {
   }
 }
 
-export interface ErrorPayload {
+export type ErrorPayload = {
   error: {
     type: string;
     message: string;
     issues?: Issue[];
   };
-}
+};
 
 export function toErrorPayload(err: unknown): {
   payload: ErrorPayload;

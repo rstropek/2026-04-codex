@@ -163,10 +163,10 @@ export function softDeleteQuestionnaire(db: QuestionnaireDb, id: number): void {
   }
 }
 
-export interface GetQuestionnaireOptions {
+export type GetQuestionnaireOptions = {
   version?: number;
   includeDeleted?: boolean;
-}
+};
 
 export function getQuestionnaire(
   db: QuestionnaireDb,
@@ -227,9 +227,9 @@ export function getQuestionnaire(
   };
 }
 
-export interface ListQuestionnairesOptions {
+export type ListQuestionnairesOptions = {
   includeDeleted?: boolean;
-}
+};
 
 export function listQuestionnaires(
   db: QuestionnaireDb,

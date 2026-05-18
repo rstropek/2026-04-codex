@@ -15,6 +15,7 @@ If you need to consider up-to-date documentation and samples (e.g. because you a
   * Context7 library ID: /biomejs/biome
 * For Vitest:
   * Context7 library ID: /vitest-dev/vitest
+  * Additionally, you can check https://vitest.dev/llms.txt
 * For Fontawesome:
   * Get up-to-date documentation at https://docs.fontawesome.com/llms.txt
 
@@ -51,6 +52,10 @@ Conceptual and architectural documentation for this project lives in the `docs/`
   * Use HTML tables only if it has a significant benefit, otherwise use CSS Grid or Flexbox
 * Use self-hosted Google Fonts as specified in the brand guidelines
 </nextjs-guidelines>
+
+<typescript-guidelines>
+* Prefer types over interfaces, unless you need declaration merging or publishing a library APi where consumers might want to augment it.
+</typescript-guidelines>
 
 <quality-assurance>
 After updating or adding any code, make sure that linting, formatting, type checking and unit tests pass without errors/warnings. Always use the scripts in `package.json` to run checks and tests; do NOT run them manually.

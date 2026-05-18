@@ -18,11 +18,21 @@ export {
   updateQuestionnaire,
 } from "./questionnaires/repository.js";
 export type {
+  BooleanQuestionResult,
+  LikertQuestionResult,
+  QuestionnaireVersionResults,
+  QuestionResult,
+  TextQuestionResult,
+} from "./questionnaires/results.js";
+export { getQuestionnaireVersionResults } from "./questionnaires/results.js";
+export type {
+  SampleDataPlan,
+  SampleQuestionnairePlan,
   SeededQuestionnaire,
   SeedSampleOptions,
   SeedSampleResult,
 } from "./questionnaires/sample.js";
-export { seedSampleData } from "./questionnaires/sample.js";
+export { buildSampleData, seedSampleData } from "./questionnaires/sample.js";
 export type {
   Answer,
   CreateQuestionnaireInput,

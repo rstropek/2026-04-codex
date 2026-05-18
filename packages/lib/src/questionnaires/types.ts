@@ -7,33 +7,33 @@ export type {
   UpdateQuestionnaireInput,
 } from "./schemas.js";
 
-export interface QuestionnaireVersionMeta {
+export type QuestionnaireVersionMeta = {
   id: number;
   versionNumber: number;
   title: string;
   createdAt: string;
-}
+};
 
-export interface Questionnaire {
+export type Questionnaire = {
   id: number;
   title: string;
   deletedAt: string | null;
   version: QuestionnaireVersionMeta;
   questions: import("./schemas.js").Question[];
-}
+};
 
-export interface QuestionnaireSummary {
+export type QuestionnaireSummary = {
   id: number;
   title: string;
   currentVersion: number | null;
   createdAt: string;
   deletedAt: string | null;
-}
+};
 
-export interface Submission {
+export type Submission = {
   id: number;
   questionnaireId: number;
   versionNumber: number;
   createdAt: string;
   answers: import("./schemas.js").Answer[];
-}
+};

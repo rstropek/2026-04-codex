@@ -1,21 +1,42 @@
 import { describe, expect, it } from "vitest";
 import { createTestDb } from "../db/test-setup.js";
 import { listSubmissions } from "./repository.js";
-import { seedSampleData } from "./sample.js";
+import { buildSampleData, seedSampleData } from "./sample.js";
 
 describe("seedSampleData", () => {
-  // Snapshot is regenerated with `pnpm --filter @questionnaires/lib test -- -u`
-  // after any intentional change to scenarios, RNG, or faker major bump.
-  it("produces a stable dataset for a fixed seed", () => {
+  it("persists exactly what buildSampleData describes", () => {
+    const seed = 42;
+    const plan = buildSampleData(seed);
     const { db } = createTestDb();
-    const result = seedSampleData(db, { seed: 42 });
-    const submissions = result.questionnaires.map((q) => ({
-      title: q.title,
-      submissions: listSubmissions(db, q.id).map((s) => ({
-        versionNumber: s.versionNumber,
-        answers: s.answers,
-      })),
-    }));
-    expect({ result, submissions }).toMatchSnapshot();
+    const result = seedSampleData(db, { seed });
+
+    expect(result.seed).toBe(seed);
+    expect(result.questionnaires).toHaveLength(plan.questionnaires.length);
+
+    plan.questionnaires.forEach((expected, idx) => {
+      const actual = result.questionnaires[idx];
+      if (!actual) throw new Error(`missing actual at index ${idx}`);
+      const expectedTotal = expected.versions.reduce(
+        (sum, v) => sum + (expected.submissionsByVersion.get(v)?.length ?? 0),
+        0,
+      );
+      expect(actual.title).toBe(expected.title);
+      expect(actual.versions).toEqual(expected.versions);
+      expect(actual.submissions).toBe(expectedTotal);
+
+      const dbSubs = listSubmissions(db, actual.id);
+      expect(dbSubs).toHaveLength(expectedTotal);
+
+      for (const version of expected.versions) {
+        const planSubs = expected.submissionsByVersion.get(version) ?? [];
+        const dbForVersion = dbSubs.filter((s) => s.versionNumber === version);
+        expect(dbForVersion).toHaveLength(planSubs.length);
+        planSubs.forEach((planSub, i) => {
+          const dbSub = dbForVersion[i];
+          if (!dbSub) throw new Error(`missing db submission at ${i}`);
+          expect(dbSub.answers).toEqual(planSub.answers);
+        });
+      }
+    });
   });
 });
