@@ -10,8 +10,10 @@
   "scripts": {
     "lint": "biome check .",
     "format": "biome format --write .",
+    "build": "pnpm -r --if-present build",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
+    "test:components": "pnpm --filter @questionnaires/web test:components",
     "test:e2e": "pnpm --filter @questionnaires/web test:e2e",
     "web": "pnpm --filter @questionnaires/web dev",
     "console": "pnpm --filter @questionnaires/console start"

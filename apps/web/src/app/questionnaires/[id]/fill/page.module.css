@@ -1,0 +1,117 @@
+.backLink {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.backLink:hover {
+  color: var(--accent);
+}
+
+.form {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prompt {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.required {
+  color: var(--accent);
+  margin-left: 4px;
+}
+
+.textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  min-height: 96px;
+  resize: vertical;
+  background: var(--bg-elevated);
+  color: var(--ink);
+}
+
+.textarea:focus {
+  outline: 2px solid var(--accent-ring);
+  border-color: var(--accent);
+}
+
+.radioRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.radioLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.likertScale {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.likertEnds {
+  font-size: 0.82rem;
+  color: var(--muted);
+  min-width: 80px;
+}
+
+.likertEndsRight {
+  text-align: right;
+}
+
+.likertOptions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.likertOption {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.submit {
+  align-self: flex-start;
+  background: var(--accent);
+  color: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submit:hover {
+  background: var(--accent-hover);
+}

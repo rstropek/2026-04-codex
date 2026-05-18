@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "pnpm --filter @questionnaires/lib build",
     "dev": "next dev",
+    "prebuild": "pnpm --filter @questionnaires/lib build",
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run --passWithNoTests",
+    "test:components": "vitest run --config vitest.browser.config.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -27,7 +30,11 @@
     "@types/node": "^25.8.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vitest/browser": "^4.1.6",
+    "@vitest/browser-playwright": "^4.1.6",
+    "playwright": "^1.60.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "vitest-browser-react": "^2.2.0"
   }
 }
