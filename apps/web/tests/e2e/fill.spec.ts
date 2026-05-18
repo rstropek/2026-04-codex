@@ -4,9 +4,13 @@ test("fill out a questionnaire and land on the thank-you page", async ({
   page,
 }) => {
   await page.goto("/questionnaires");
-  await page.locator("main li").first().getByRole("link", {
-    name: "Fill out",
-  }).click();
+  await page
+    .locator("main li")
+    .first()
+    .getByRole("link", {
+      name: "Fill out",
+    })
+    .click();
 
   await page.waitForURL(/\/questionnaires\/\d+\/fill$/);
   const fillUrl = new URL(page.url());

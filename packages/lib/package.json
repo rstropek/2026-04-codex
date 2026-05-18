@@ -17,10 +17,6 @@
     "./schema": {
       "types": "./dist/db/schema.d.ts",
       "import": "./dist/db/schema.js"
-    },
-    "./math": {
-      "types": "./dist/math.d.ts",
-      "import": "./dist/math.js"
     }
   },
   "files": [

@@ -30,7 +30,7 @@ export async function submitAnswersAction(formData: FormData) {
     const raw = formData.get(q.qid);
     if (q.type === "text") {
       const value = raw == null ? "" : raw.toString();
-      if (!value.trim() && !q.required) continue;
+      if (!value.trim()) continue;
       answers.push({ qid: q.qid, type: "text", value });
     } else if (q.type === "boolean") {
       if (raw == null) continue;

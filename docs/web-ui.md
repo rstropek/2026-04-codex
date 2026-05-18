@@ -24,10 +24,13 @@ per question type is split into isolated components under
 
 `apps/web/src/server/db.ts` reads `DATABASE_URL` (absolute path; configured in
 `apps/web/.env.local`), opens it with `createDb`, and runs `applyMigrations`.
-The open call is wrapped in `React.cache` so each request reuses one
-connection across its server components. Pages that depend on the DB are
-marked `export const dynamic = "force-dynamic"` so Next never tries to
-prerender them against the database. `better-sqlite3` is in
+The native SQLite handle is stored in a process-level singleton so requests
+reuse one connection instead of leaking one per render. The public `getDb()`
+call remains wrapped in `React.cache` so each request gets stable object
+identity across its server components. If `DATABASE_URL` changes during a dev
+session, the old handle is closed before a new one is opened. Pages that depend
+on the DB are marked `export const dynamic = "force-dynamic"` so Next never
+tries to prerender them against the database. `better-sqlite3` is in
 `serverExternalPackages` so its native addon is loaded by Node at runtime
 rather than bundled.
 
