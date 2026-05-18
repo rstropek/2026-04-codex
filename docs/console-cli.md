@@ -25,11 +25,12 @@ add it there. Do not let the CLI grow a parallel notion of the domain.
 
 ## Command surface
 
-Two groups plus a maintenance command:
+Two groups, a maintenance command, plus an MCP server command:
 
 - `questionnaire create | get | result | list | update | delete`
 - `submission list | submit`
 - `db migrate | sample`
+- `mcp`
 
 `create`, `update`, and `submit` take a JSON document via `--file <path>` or
 piped stdin. Everything else is flag-driven. `questionnaire result --id <n>`
@@ -43,6 +44,20 @@ existing rows. `--seed` is optional; if omitted, a random seed is generated
 and echoed in the output so the run is replayable. The generator itself
 lives in `@questionnaires/lib` (`seedSampleData`) so the CLI handler stays
 pure plumbing per the thin-wrapper invariant.
+
+`mcp` runs a STDIO Model Context Protocol server for AI clients. It exposes
+`questionnaire_list`, `questionnaire_get`, `questionnaire_result`, and
+`submission_submit`, each backed by the same library functions as the CLI
+commands above. Before calling `submission_submit`, clients must call
+`questionnaire_get` to inspect the target questionnaire version and questions.
+Submitted answers must use the returned qids, match each question type, answer
+required questions, and respect likert ranges; otherwise the lib validation
+rejects the submission. The MCP input schema models answer variants with
+`anyOf` for the text, boolean, and likert answer shapes.
+
+The same tool surface is available over Streamable HTTP in the Next.js app —
+see `docs/web-mcp.md`. Both transports share the registration code in
+`packages/lib/src/mcp.ts` so the tool set cannot drift.
 
 ## Output contract
 

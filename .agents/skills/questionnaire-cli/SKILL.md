@@ -180,6 +180,29 @@ Output shape:
 The generator itself lives in `@questionnaires/lib` (`seedSampleData`); the
 CLI handler is pure plumbing per the thin-wrapper invariant.
 
+### `mcp [--db <url>]`
+
+Run a STDIO Model Context Protocol server backed by the same library
+functions as the CLI commands.
+
+```
+pnpm console mcp --db /tmp/q.db
+```
+
+Exposed tools:
+
+- `questionnaire_list`
+- `questionnaire_get`
+- `questionnaire_result`
+- `submission_submit`
+
+Before calling `submission_submit`, an AI client must call
+`questionnaire_get` to retrieve the target questionnaire version and its
+questions. The submission must use the returned qids, match each question's
+type, answer required questions, and keep likert values inside the question's
+range; otherwise the server rejects it via lib validation. The MCP schema for
+answers uses `anyOf` for the text, boolean, and likert answer shapes.
+
 ## Error shape
 
 Errors are emitted as JSON on stderr. Branch on `error.type`:

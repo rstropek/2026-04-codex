@@ -2,8 +2,11 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PassThrough, Readable } from "node:stream";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { runCli } from "./index.js";
+import { createQuestionnaireMcpServer } from "./mcp.js";
 
 type RunResult = {
   exitCode: number;
@@ -327,5 +330,46 @@ describe("questionnaire CLI", () => {
     const payload = parseOut<{ migrated: boolean; db: string }>(res.stdout);
     expect(payload.migrated).toBe(true);
     expect(payload.db).toBe(dbPath);
+  });
+
+  it("exposes questionnaire tools through the MCP server", async () => {
+    const server = createQuestionnaireMcpServer({ db: dbPath, env: {} });
+    const client = new Client({
+      name: "questionnaire-cli-test",
+      version: "0.1.0",
+    });
+    const [clientTransport, serverTransport] =
+      InMemoryTransport.createLinkedPair();
+
+    try {
+      await Promise.all([
+        server.connect(serverTransport),
+        client.connect(clientTransport),
+      ]);
+
+      const tools = await client.listTools();
+      expect(tools.tools.map((tool) => tool.name).sort()).toEqual([
+        "questionnaire_get",
+        "questionnaire_list",
+        "questionnaire_result",
+        "submission_submit",
+      ]);
+
+      const submitTool = tools.tools.find(
+        (tool) => tool.name === "submission_submit",
+      );
+      expect(JSON.stringify(submitTool?.inputSchema).includes('"anyOf"')).toBe(
+        true,
+      );
+
+      const result = await client.callTool({
+        name: "questionnaire_list",
+        arguments: {},
+      });
+      expect("isError" in result ? result.isError : false).toBeFalsy();
+    } finally {
+      await client.close();
+      await server.close();
+    }
   });
 });
