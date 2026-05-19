@@ -1,0 +1,11 @@
+{
+  "name": "mcp-demo",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n server,host -c cyan,green \"pnpm -C mcp-server dev\" \"pnpm -C basic-host dev\"",
+    "start": "concurrently -n server,host -c cyan,green \"pnpm -C mcp-server start\" \"pnpm -C basic-host start\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "mcp-apps-demo-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Step-by-step MCP Apps training demo. One Express server, six tools, six UI bundles.",
+  "scripts": {
+    "build:ui": "node scripts/build-ui.mjs",
+    "build:ui:watch": "node scripts/build-ui.mjs --watch",
+    "build:server": "tsc -p tsconfig.server.json",
+    "build": "pnpm run build:ui && pnpm run build:server",
+    "dev": "cross-env NODE_ENV=development concurrently -n ui,srv -c cyan,magenta \"pnpm run build:ui:watch\" \"tsx watch src/main.ts\"",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.server.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.7.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.8.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "tsx": "^4.22.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}
