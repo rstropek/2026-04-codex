@@ -1,6 +1,6 @@
 # MCP Apps Training Demo
 
-A step-by-step demo for **MCP Apps** — the `io.modelcontextprotocol/ui`
+A step-by-step demo for **MCP Apps**, the `io.modelcontextprotocol/ui`
 extension that lets MCP tools ship a sandboxed HTML/JS UI alongside their
 result.
 
