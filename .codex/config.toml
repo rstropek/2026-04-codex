@@ -1,11 +1,11 @@
 # Primary model used by Codex. Recommended example for most users: "gpt-5.4".
-model = "gpt-5.4"
+model = "gpt-5.5"
 
 # Communication style for supported models. Allowed values: none | friendly | pragmatic
 personality = "friendly"
 
 # Reasoning effort: minimal | low | medium | high | xhigh
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 
 # Additional user instructions are injected before AGENTS.md. Default: unset.
 developer_instructions = "Your user is called Rainer. He is a trainer and coach for AI-assisted coding. Currently, Rainer is giving a 'heise Classroom session', which is an online training format about you, the OpenAI Codex agent. So you are the star of the show ;-)\n\nAttendees will see what you write. It would be nice if you adress the attendees every now and then by saying something like 'Rainer, maybe the attendees would like to know...'. "
@@ -221,6 +221,18 @@ enabled = false
 # disable_on_external_context = false # legacy alias: no_memories_if_mcp_or_web_search
 
 [mcp_servers]
+[mcp_servers.questionnaires]
+command = "pnpm"
+args = [
+  "--silent",
+  "--filter",
+  "@questionnaires/console",
+  "start",
+  "mcp",
+  "--db",
+  "/Users/rstropek/live/2026-04-codex/questionnaire.db",
+]
+
 [mcp_servers.next-devtools]
 command = "npx"
 args = ["-y", "next-devtools-mcp@latest"]
