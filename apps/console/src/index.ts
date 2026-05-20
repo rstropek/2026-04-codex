@@ -12,6 +12,7 @@ import {
   cmdSubmissionList,
   cmdSubmissionSubmit,
 } from "./commands/submission.js";
+import { runMcpServer } from "./mcp.js";
 import { writeError } from "./output.js";
 import type { CliIo, CommandContext } from "./runtime.js";
 
@@ -151,6 +152,14 @@ export async function runCli(io: CliIo): Promise<number> {
     .option("--db <url>", "Database URL")
     .action((opts: { db?: string; seed?: string }) => {
       cmdDbSample(ctx, mergeDb(program, opts));
+    });
+
+  program
+    .command("mcp")
+    .description("Run a STDIO MCP server for questionnaire operations")
+    .option("--db <url>", "Database URL")
+    .action(async (opts: { db?: string }) => {
+      await runMcpServer(ctx, mergeDb(program, opts));
     });
 
   try {

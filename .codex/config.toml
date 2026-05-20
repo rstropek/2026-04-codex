@@ -221,17 +221,15 @@ enabled = false
 # disable_on_external_context = false # legacy alias: no_memories_if_mcp_or_web_search
 
 [mcp_servers]
-[mcp_servers.questionnaires]
-command = "pnpm"
-args = [
-  "--silent",
-  "--filter",
-  "@questionnaires/console",
-  "start",
-  "mcp",
-  "--db",
-  "/Users/rstropek/live/2026-04-codex/questionnaire.db",
-]
+# [mcp_servers.questionnaires]
+# command = "pnpm"
+# args = [
+#   "--silent",
+#   "console",
+#   "mcp",
+#   "--db",
+#   "/Users/rstropek/live/2026-04-codex/questionnaire.db",
+# ]
 
 [mcp_servers.next-devtools]
 command = "npx"

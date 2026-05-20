@@ -25,6 +25,12 @@ export type {
   TextQuestionResult,
 } from "./questionnaires/results.js";
 export { getQuestionnaireVersionResults } from "./questionnaires/results.js";
+export type { McpErrorPayload, RegisterMcpToolsDeps } from "./mcp.js";
+export {
+  defaultMcpErrorPayload,
+  MCP_SERVER_INSTRUCTIONS,
+  registerQuestionnaireMcpTools,
+} from "./mcp.js";
 export type {
   SampleDataPlan,
   SampleQuestionnairePlan,

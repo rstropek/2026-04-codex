@@ -10,8 +10,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "@questionnaires/lib": "workspace:*",
-    "commander": "^14.0.3"
+    "commander": "^14.0.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^25.8.0",
